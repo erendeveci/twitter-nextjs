@@ -1,0 +1,116 @@
+/* const [formData, setFormData] = useState<{email:string | null, password: string | null}>({ email: null, password: null }); */
+
+    /* // formData = { email: "test", password: "1234", firstName: "first", lastName: "last"}
+
+
+    setFormData(x => ({...x, email: "qwe", firstName: "first2"}));
+    setFormData({...formData, email: "qwe"}); */
+
+
+
+// useCache
+
+import { useState } from 'react';
+import { getItem, setItem } from '../services/cache';
+
+export function useCache(key, initialValue) {
+  const [cacheValue, setCacheValue] = useState(getItem(key) ?? initialValue);
+
+  const setValue = (value) => {
+    const valueToCache = value instanceof Function ? value(cacheValue) : value;
+    setCacheValue(valueToCache);
+    setItem(key, valueToCache);
+  };
+  return [cacheValue, setValue];
+}
+
+
+const [cache, setCache] = useCache("token");
+
+####################################
+########### useCacheUser ###########
+####################################
+import jwtDecode from 'jwt-decode';
+import { useCache } from './useCache';
+
+export function useCacheUser() {
+  const [token, setToken] = useCache('tkn');
+
+  const getValue = () => {
+    if (!token) return null;
+    let user = jwtDecode(token);
+    if (!user) return null;
+
+    return {
+      ...user,
+      token,
+      expired: user.exp < Date.now() / 1000,
+    };
+  };
+
+  return [getValue(), setToken];
+}
+
+
+const [user,setUser] = useCacheUser();
+
+setUser({id:1,name:'test'});
+
+const [user] = useCacheUser();
+
+user.id
+
+
+
+const Button: React.FC<ButtonProps> = ({
+  template,
+}) => {
+  return (
+    <button
+      className={`hover:opacity-80 transition border-2 ${template}`}
+    >
+      {label}
+    </button>
+  );
+};
+
+export default Button;
+
+<Button template="bg-black txt-white">
+    text
+</Button>
+
+
+const Button: React.FC<ButtonProps> = ({
+  templates,
+}) => {
+  return (
+    <Container templates={templates}>
+      {label}
+    </Container>
+  );
+};
+
+const Container = styled.div`
+${({templates}) => templates?.includes("bg-black") && css``}
+`
+
+export default Button;
+
+<Button template="bg-black txt-white">
+    text
+</Button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
